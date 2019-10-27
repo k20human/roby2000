@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { faArrowLeft, faArrowRight, faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons';
+import { MovementService } from '../services/movement.service';
 
 @Component({
     selector: 'app-dashboard',
@@ -12,10 +13,27 @@ export class DashboardComponent implements OnInit {
     iconRight = faArrowRight;
     iconDown = faArrowDown;
 
-    constructor() {
+    constructor(
+        private movementService: MovementService
+    ) {
     }
 
     ngOnInit() {
     }
 
+    moveUp() {
+        this.movementService.goUp();
+    }
+
+    moveDown() {
+        this.movementService.goDown();
+    }
+
+    moveLeft() {
+        this.movementService.goLeft();
+    }
+
+    moveRight() {
+        this.movementService.goRight();
+    }
 }

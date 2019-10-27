@@ -1,3 +1,6 @@
+import { apiHubConfig } from './api.config';
+
 export const environment = {
-  production: true
+    production: true,
+    hub: apiHubConfig
 };

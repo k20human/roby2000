@@ -8,6 +8,8 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { MaterialModule } from './material.module';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { MovementService } from './services/movement.service';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
     declarations: [
@@ -20,9 +22,12 @@ import { DashboardComponent } from './dashboard/dashboard.component';
         BrowserAnimationsModule,
         FontAwesomeModule,
         FlexLayoutModule,
-        MaterialModule
+        MaterialModule,
+        HttpClientModule,
     ],
-    providers: [],
+    providers: [
+        MovementService
+    ],
     bootstrap: [AppComponent]
 })
 export class AppModule {
