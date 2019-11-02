@@ -1,3 +1,4 @@
 pymercure
+RPi.GPIO==0.7.0
 gpiozero===1.5.1
 python-dotenv==0.10.1

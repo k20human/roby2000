@@ -7,7 +7,6 @@ import os
 from pathlib import Path
 from common.motors.movement import Movement
 
-
 class Configurator:
     def __init__(self):
         env_path = str(Path('.')) + '/.env'
