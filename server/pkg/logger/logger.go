@@ -3,15 +3,26 @@ package logger
 import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"log"
 	"strings"
 )
 
 func New() (*zap.Logger, error) {
-	var l *zap.Logger
 	var err error
+	var l *zap.Logger
+	var c *config
+	var level zapcore.Level
+
+	if c, err = initConfig(); err != nil {
+		log.Fatalf("Configuration: %s\n", err)
+	}
+
+	if level, err = zapcore.ParseLevel(c.Level); err != nil {
+		log.Fatalf(err.Error())
+	}
 
 	if l, err = (zap.Config{
-		Level:            zap.NewAtomicLevelAt(zapcore.DebugLevel),
+		Level:            zap.NewAtomicLevelAt(level),
 		Encoding:         "console",
 		OutputPaths:      []string{"stderr"},
 		ErrorOutputPaths: []string{"stderr"},
