@@ -1,10 +1,18 @@
 package logger
 
 import (
+	"github.com/pkg/errors"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"log"
+	"os"
+	"path/filepath"
 	"strings"
+)
+
+const (
+	logPath    = "/var/log/roby2000/roby2000.log"
+	fodlerPerm = 0o777
 )
 
 func New() (*zap.Logger, error) {
@@ -21,11 +29,15 @@ func New() (*zap.Logger, error) {
 		log.Fatalf(err.Error())
 	}
 
+	if err = os.MkdirAll(filepath.Dir(logPath), fodlerPerm); err != nil {
+		return nil, errors.Errorf("unable to create directory for file '%s': %s\nPlease create it manually\n", logPath, err.Error())
+	}
+
 	if l, err = (zap.Config{
 		Level:            zap.NewAtomicLevelAt(level),
 		Encoding:         "console",
-		OutputPaths:      []string{"stderr"},
-		ErrorOutputPaths: []string{"stderr"},
+		OutputPaths:      []string{"stdout", logPath},
+		ErrorOutputPaths: []string{"stderr", logPath},
 		EncoderConfig: zapcore.EncoderConfig{
 			MessageKey:   "message",
 			LevelKey:     "level",

@@ -31,7 +31,7 @@ func main() {
 
 	defer logger.Close(l)
 
-	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 	defer stop()
 
 	gin.SetMode(c.GinMode)
@@ -50,7 +50,7 @@ func main() {
 		}
 	}()
 
-	l.Info("Server started", zap.Any("port", c.Port))
+	l.Info("Server and robot driver started", zap.Any("port", c.Port))
 
 	<-ctx.Done()
 
@@ -92,4 +92,6 @@ func initRoutes(r gin.RouterGroup, h handler.Handler) {
 	r.GET("/", func(c *gin.Context) {
 		c.String(http.StatusOK, "Welcome to Roby2000")
 	})
+
+	r.GET("/move/:action", h.Move)
 }
