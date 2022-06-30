@@ -5,10 +5,12 @@ import (
 	"github.com/k20human/roby2000/pkg/logger"
 	"github.com/k20human/roby2000/pkg/robot"
 	"go.uber.org/zap"
+	"net/http"
 )
 
 type Handler interface {
 	Move(c *gin.Context)
+	Light(c *gin.Context)
 	Close()
 }
 
@@ -39,4 +41,9 @@ func (h *handler) Close() {
 	}
 
 	logger.Close(h.logger)
+}
+
+func (h *handler) logAndServeError(c *gin.Context, err error) {
+	h.logger.Error(err.Error())
+	c.JSON(http.StatusInternalServerError, &errorResponse{Error: err, Message: "Error"})
 }

@@ -9,19 +9,19 @@ type configMotor struct {
 }
 
 type config struct {
-	MotorLeft  configMotor `mapstructure:"motor_left"`
-	MotorRight configMotor `mapstructure:"motor_right"`
-	Speed      uint32      `mapstructure:"speed"`
+	MotorLeft    configMotor `mapstructure:"motor_left"`
+	MotorRight   configMotor `mapstructure:"motor_right"`
+	DefaultSpeed uint32      `mapstructure:"speed"`
 }
 
 func defaultConfig() {
 	viper.SetDefault("movement.motor_left.pin1", 14)
 	viper.SetDefault("movement.motor_left.pin2", 26)
-	viper.SetDefault("movement.motor_left.pwm", 12)
+	viper.SetDefault("movement.motor_left.pwm", 19)
 
 	viper.SetDefault("movement.motor_right.pin1", 22)
 	viper.SetDefault("movement.motor_right.pin2", 27)
-	viper.SetDefault("movement.motor_right.pwm", 18)
+	viper.SetDefault("movement.motor_right.pwm", 13)
 
 	viper.SetDefault("movement.speed", 50)
 }

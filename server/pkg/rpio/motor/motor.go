@@ -116,8 +116,8 @@ func (e *engine) Stop() {
 	e.inLeft2.Low()
 	e.inRight1.Low()
 	e.inRight2.Low()
-	//e.pwmLeft.Low()
-	//e.pwmRight.Low()
+	e.pwmLeft.Low()
+	e.pwmRight.Low()
 }
 
 func (e *engine) Speed(s uint32) {

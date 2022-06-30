@@ -1,7 +1,7 @@
 package movement
 
 import (
-	"github.com/k20human/roby2000/pkg/motor"
+	"github.com/k20human/roby2000/pkg/rpio/motor"
 	"time"
 )
 
@@ -14,7 +14,7 @@ type Mover interface {
 	Backward()
 	Left()
 	Right()
-	Close()
+	Close() error
 }
 
 type move struct {
@@ -31,7 +31,7 @@ func New() (*move, error) {
 	}
 
 	return &move{
-		speed: c.Speed,
+		speed: c.DefaultSpeed,
 		wheels: motor.New(
 			c.MotorLeft.Pin1,
 			c.MotorLeft.Pin2,
@@ -78,6 +78,8 @@ func (m *move) Right() {
 	}()
 }
 
-func (m *move) Close() {
+func (m *move) Close() error {
 	m.wheels.Stop()
+
+	return nil
 }

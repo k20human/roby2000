@@ -94,4 +94,5 @@ func initRoutes(r gin.RouterGroup, h handler.Handler) {
 	})
 
 	r.GET("/move/:action", h.Move)
+	r.GET("/light/:action/:type/:color", h.Light)
 }

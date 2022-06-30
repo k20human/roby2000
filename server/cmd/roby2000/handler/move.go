@@ -19,13 +19,16 @@ func (h *handler) Move(c *gin.Context) {
 		if v == action {
 			switch action {
 			case "forward":
-				h.driver.Forward()
+				if err := h.driver.MoveForward(); err != nil {
+					h.logger.Error(err.Error())
+					return
+				}
 			case "backward":
-				h.driver.Backward()
+				h.driver.MoveBackward()
 			case "left":
-				h.driver.Left()
+				h.driver.MoveLeft()
 			case "right":
-				h.driver.Right()
+				h.driver.MoveRight()
 			}
 
 			c.JSON(http.StatusOK, &successResponse{Message: "OK"})
