@@ -3,12 +3,15 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/dhowden/raspicam"
 	"github.com/gin-contrib/gzip"
 	"github.com/k20human/roby2000/cmd/roby2000/handler"
 	"github.com/k20human/roby2000/pkg/logger"
 	"go.uber.org/zap"
+	"io"
 	"log"
 	"net/http"
+	"os"
 	"os/signal"
 	"syscall"
 	"time"
@@ -93,6 +96,21 @@ func initRoutes(r gin.RouterGroup, h handler.Handler) {
 		c.String(http.StatusOK, "Welcome to Roby2000")
 	})
 
+	s := raspicam.NewStill()
+	errCh := make(chan error)
+	go func() {
+		for x := range errCh {
+			fmt.Fprintf(os.Stderr, "%v\n", x)
+		}
+	}()
+
 	r.GET("/move/:action", h.Move)
 	r.GET("/light/:action/:type/:color", h.Light)
+	r.GET("/audio/:action/:filename", h.Audio)
+	r.GET("/stream", func(c *gin.Context) {
+		c.Stream(func(w io.Writer) bool {
+			raspicam.Capture(s, w, errCh)
+			return false
+		})
+	})
 }

@@ -1,6 +1,7 @@
 package robot
 
 import (
+	"github.com/k20human/roby2000/pkg/robot/audio"
 	"github.com/k20human/roby2000/pkg/robot/distance"
 	"github.com/k20human/roby2000/pkg/robot/light"
 	"github.com/k20human/roby2000/pkg/robot/movement"
@@ -20,6 +21,7 @@ type Robot interface {
 	LightsFront(action, c string) error
 	LightsBack(action, c string) error
 	LightsBlinking(action string) error
+	PlaySound(filename string) error
 	Close() error
 }
 
@@ -27,6 +29,7 @@ type robot struct {
 	mover    movement.Mover
 	distance distance.Measure
 	light    light.Controller
+	audio    audio.Player
 }
 
 func New() (*robot, error) {
@@ -60,6 +63,10 @@ func New() (*robot, error) {
 		return nil, err
 	}
 
+	if r.audio, err = audio.New(); err != nil {
+		return nil, err
+	}
+
 	return &r, nil
 }
 
@@ -74,6 +81,10 @@ func (r *robot) Close() error {
 	}
 
 	if err := r.light.Close(); err != nil {
+		return err
+	}
+
+	if err := r.audio.Close(); err != nil {
 		return err
 	}
 

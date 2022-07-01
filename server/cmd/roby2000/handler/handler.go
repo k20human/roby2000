@@ -11,6 +11,7 @@ import (
 type Handler interface {
 	Move(c *gin.Context)
 	Light(c *gin.Context)
+	Audio(c *gin.Context)
 	Close()
 }
 

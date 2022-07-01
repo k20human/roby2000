@@ -1,14 +1,11 @@
 package light
 
 import (
-	"bufio"
 	"fmt"
-	"github.com/k20human/roby2000/pkg/logger"
+	"github.com/k20human/roby2000/pkg/robot/system"
 	"github.com/samber/lo"
-	"go.uber.org/zap"
 	"image/color"
-	"io"
-	"os/exec"
+	"os"
 	"strconv"
 )
 
@@ -30,27 +27,30 @@ type light struct {
 	config        *config
 	nbLeds        int
 	currentColors []color.RGBA
-	logger        *zap.Logger
+	sys           *system.Driver
 }
 
 func New() (*light, error) {
 	var err error
 	var c *config
-	var l light
+	var sys *system.Driver
 
 	if c, err = initConfig(); err != nil {
 		return nil, err
 	}
 
-	l.config = c
-	l.nbLeds = len(c.LedsBack) + len(c.LedsFront) + len(c.LedsBlinking)
-	l.currentColors = make([]color.RGBA, l.nbLeds)
-
-	if l.logger, err = logger.New(); err != nil {
+	if sys, err = system.New(); err != nil {
 		return nil, err
 	}
 
-	return &l, nil
+	nbLeds := len(c.LedsBack) + len(c.LedsFront) + len(c.LedsBlinking)
+
+	return &light{
+		config:        c,
+		nbLeds:        nbLeds,
+		currentColors: make([]color.RGBA, nbLeds),
+		sys:           sys,
+	}, nil
 }
 
 func (l *light) Front(c color.RGBA) error {
@@ -97,8 +97,13 @@ func (l *light) Close() error {
 }
 
 func (l *light) call(action string) error {
+	currentDir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
 	args := []string{
-		l.config.PythonScriptPath,
+		currentDir + "/" + l.config.PythonScriptPath,
 		action,
 		strconv.Itoa(l.nbLeds),
 		strconv.FormatFloat(l.config.DefaultBrightness, 'f', -1, 64),
@@ -108,38 +113,7 @@ func (l *light) call(action string) error {
 		args = append(args, colorToString(c))
 	}
 
-	cmd := exec.Command("python3", args...)
-
-	stdout, err := cmd.StdoutPipe()
-	if err != nil {
-		return err
-	}
-
-	stderr, err := cmd.StderrPipe()
-	if err != nil {
-		return err
-	}
-
-	go l.copyOutput(stdout, false)
-	go l.copyOutput(stderr, true)
-
-	err = cmd.Start()
-	if err != nil {
-		return err
-	}
-
-	return cmd.Wait()
-}
-
-func (l *light) copyOutput(r io.Reader, isError bool) {
-	scanner := bufio.NewScanner(r)
-	for scanner.Scan() {
-		if isError {
-			l.logger.Error(scanner.Text())
-		} else {
-			l.logger.Info(scanner.Text())
-		}
-	}
+	return l.sys.Call("python3", args)
 }
 
 func colorToString(c color.RGBA) string {
